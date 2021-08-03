@@ -1,0 +1,82 @@
+
+import math
+import torch
+from torch.optim.optimizer import Optimizer
+import numpy as np
+import torch.nn as nn
+#import torch.optim as Optimizer
+
+class FraM(Optimizer):
+
+
+    def __init__(self, params, lr=1e-1, betas=(0, 0), eps=1e-5, weight_decay=1e-4):
+        if not 0.0 <= lr:
+            raise ValueError("Invalid learning rate: {}".format(lr))
+        if not 0.0 <= eps:
+            raise ValueError("Invalid epsilon value: {}".format(eps))
+        if not 0.0 <= betas[0] < 1.0:
+            raise ValueError("Invalid beta parameter at index 0: {}".format(betas[0]))
+        if not 0.0 <= betas[1] < 1.0:
+            raise ValueError("Invalid beta parameter at index 1: {}".format(betas[1]))
+        defaults = dict(lr=lr, betas=betas, eps=eps, weight_decay=weight_decay)
+        super(FraM, self).__init__(params, defaults)
+
+    def __setstate__(self, state):
+        super(FraM, self).__setstate__(state)
+
+    def step(self, closure=None):
+
+        loss = None
+        if closure is not None:
+            loss = closure()
+
+        for group in self.param_groups:
+            for p in group['params']:
+                if p.grad is None:
+                    continue
+                grad = p.grad.data
+                if grad.is_sparse:
+                    raise RuntimeError('FracM does not support sparse gradients')
+
+                state = self.state[p]
+
+                # State initialization
+                if len(state) == 0:
+                    state['step'] = 0
+                    # Exponential moving average of gradient values
+                    state['exp_avg'] = torch.zeros_like(p.data)
+                    state['exp1_avg'] = torch.zeros_like(p.data)
+                    state['exp2_avg'] = torch.zeros_like(p.data)
+                    state['exp3_avg'] = torch.zeros_like(p.data)
+                    state['exp4_avg'] = torch.zeros_like(p.data)
+                    
+                exp_avg, exp1_avg,exp2_avg,exp3_avg,exp4_avg = state['exp_avg'],state['exp1_avg'],state['exp2_avg'],state['exp3_avg'],state['exp4_avg']
+                beta1, beta2 = group['betas']
+
+                state['step'] += 1
+
+                if group['weight_decay'] != 0:
+                    grad.add_(group['weight_decay'], p.data)
+
+                exp_avg.add_(10, grad.clone()).add_(-0.009765625, exp2_avg).add_(4.2915344e-05, exp4_avg)   
+                
+                
+                exp4_avg=exp3_avg
+                exp3_avg=exp2_avg
+                exp2_avg=exp1_avg
+                exp1_avg=exp_avg
+                
+                
+                exp_avg1 = exp_avg
+                
+                
+                state['exp_avg'] = torch.zeros_like(p.data)
+
+                
+             
+                step_size = group['lr']
+                
+                
+                p.data.add_(-step_size, exp_avg1)
+                
+        return loss
