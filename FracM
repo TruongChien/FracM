@@ -49,8 +49,28 @@ class FraM(Optimizer):
                     state['exp2_avg'] = torch.zeros_like(p.data)
                     state['exp3_avg'] = torch.zeros_like(p.data)
                     state['exp4_avg'] = torch.zeros_like(p.data)
+                    state['exp5_avg'] = torch.zeros_like(p.data)
+                    state['exp6_avg'] = torch.zeros_like(p.data)
+                    state['exp7_avg'] = torch.zeros_like(p.data)
+                    state['exp8_avg'] = torch.zeros_like(p.data)
+                    state['exp9_avg'] = torch.zeros_like(p.data)
+                    state['exp10_avg'] = torch.zeros_like(p.data)
+                    # Previous gradient
+                    state['previous_grad'] = torch.zeros_like(p.data)
+                    state['previous1_grad'] = torch.zeros_like(p.data)
+                    state['previous2_grad'] = torch.zeros_like(p.data)
+                    state['previous3_grad'] = torch.zeros_like(p.data)
+                    state['previous4_grad'] = torch.zeros_like(p.data)
+                    state['previous5_grad'] = torch.zeros_like(p.data)
+                    state['previous6_grad'] = torch.zeros_like(p.data)
+                    state['previous7_grad'] = torch.zeros_like(p.data)
+                    state['previous8_grad'] = torch.zeros_like(p.data)
+                    state['previous9_grad'] = torch.zeros_like(p.data)
+                    state['previous10_grad'] = torch.zeros_like(p.data)
                     
-                exp_avg, exp1_avg,exp2_avg,exp3_avg,exp4_avg = state['exp_avg'],state['exp1_avg'],state['exp2_avg'],state['exp3_avg'],state['exp4_avg']
+                exp_avg, exp1_avg,exp2_avg,exp3_avg,exp4_avg,exp5_avg,exp6_avg,exp7_avg,exp8_avg,exp9_avg,exp10_avg = state['exp_avg'],state['exp1_avg'],state['exp2_avg'],state['exp3_avg'],state['exp4_avg'],state['exp5_avg'],state['exp6_avg'],state['exp7_avg'],state['exp8_avg'],state['exp9_avg'],state['exp10_avg']
+                previous_grad, previous1_grad, previous2_grad, previous3_grad, previous4_grad,  previous5_grad, previous6_grad, previous7_grad, previous8_grad, previous9_grad, previous10_grad = state['previous_grad'], state['previous1_grad'], state['previous2_grad'], state['previous3_grad'], state['previous4_grad'], state['previous5_grad'], state['previous6_grad'], state['previous7_grad'], state['previous8_grad'], state['previous9_grad'], state['previous10_grad']
+                
                 beta1, beta2 = group['betas']
 
                 state['step'] += 1
@@ -58,13 +78,148 @@ class FraM(Optimizer):
                 if group['weight_decay'] != 0:
                     grad.add_(group['weight_decay'], p.data)
 
-                exp_avg.add_(10, grad.clone()).add_(-0.009765625, exp2_avg).add_(4.2915344e-05, exp4_avg)   
+                # exp_avg.add_(10, grad.clone()).add_(-0.009765625, exp2_avg).add_(4.2915344e-05, exp4_avg)   
+                # exp_avg.add_(1, grad.clone()).add_(2, exp2_avg).add_(-0.5, exp4_avg).add_(0.0625, exp6_avg)
+                
+                #10-fractional order 
+                # exp_avg.add_(1, grad.clone()).add_(1, exp_avg).add_(-0.009765, previous2_grad).add_(-0.009765, exp2_avg).add_(0.04394, previous4_grad).add_(0.04394, exp4_avg).add_(-0.11718, previous6_grad).add_(-0.11718, exp6_avg).add_(0.2050, previous8_grad).add_(0.2050, exp8_avg)
                 
                 
+                #2.5-fractional order 
+                # exp_avg.add_(1, grad.clone()).add_(1, exp_avg).add_(-0.441941, previous2_grad).add_(-0.441941, exp2_avg).add_(0.331456, previous4_grad).add_(0.331456, exp4_avg).add_(-0.055242, previous6_grad).add_(-0.055242, exp6_avg).add_(-0.006905, previous8_grad).add_(-0.006905, exp8_avg).add_(-0.00207, previous10_grad).add_(-0.00207, exp10_avg)
+                
+                #4.5-fractional order 
+                # exp_avg.add_(1, grad.clone()).add_(1, exp_avg).add_(-0.198873, previous2_grad).add_(-0.198873, exp2_avg).add_(0.348029, previous4_grad).add_(0.348029, exp4_avg).add_(-0.29002, previous6_grad).add_(-0.29002, exp6_avg).add_(0.1087590, previous8_grad).add_(0.1087590, exp8_avg).add_(-0.0108759, previous10_grad).add_(-0.0108759, exp10_avg)
+                
+                
+                #4.5-fractional order and beta 
+                # exp_avg.add_(1, grad.clone()).add_(1*0.8, exp_avg).add_(-0.198873, previous2_grad).add_(-0.198873*0.8, exp2_avg).add_(0.348029, previous4_grad).add_(0.348029*0.8, exp4_avg).add_(-0.29002, previous6_grad).add_(-0.29002*0.8, exp6_avg).add_(0.1087590, previous8_grad).add_(0.1087590*0.8, exp8_avg).add_(-0.0108759, previous10_grad).add_(-0.0108759*0.8, exp10_avg)
+                
+                #8.5-fractional order 
+                # exp_avg.add_(1, grad.clone()).add_(1, exp_avg).add_(-0.0234781, previous2_grad).add_(-0.0234781, exp2_avg).add_(0.088043, previous4_grad).add_(0.088043, exp4_avg).add_(-0.19076, previous6_grad).add_(-0.19076, exp6_avg).add_(0.262295, previous8_grad).add_(0.262295, exp8_avg).add_(-0.2360, previous10_grad).add_(-0.2360, exp10_avg)
+                
+                
+                #12-fractional order 
+                # exp_avg.add_(1, grad.clone()).add_(1, exp_avg).add_( -0.0029296875, previous2_grad).add_( -0.0029296875, exp2_avg).add_(0.01611, previous4_grad).add_(0.01611, exp4_avg).add_(-0.05371, previous6_grad).add_(-0.05371, exp6_avg).add_(0.120849, previous8_grad).add_(0.120849, exp8_avg).add_( -0.193359, previous10_grad).add_( -0.193359, exp10_avg)
+
+                #12-fractional order 
+                # exp_avg.add_(1, grad.clone()).add_(1*0.9, exp_avg).add_( -0.0029296875, previous2_grad).add_( -0.0029296875*0.9, exp2_avg).add_(0.01611, previous4_grad).add_(0.01611*0.9, exp4_avg).add_(-0.05371, previous6_grad).add_(-0.05371*0.9, exp6_avg).add_(0.120849, previous8_grad).add_(0.120849*0.9, exp8_avg).add_( -0.193359, previous10_grad).add_( -0.193359*0.9, exp10_avg)
+
+
+
+
+
+
+                
+                #0.9-fractional order 第一个
+                # exp_avg.add_(1, grad.clone()).add_(1*0.9, exp_avg).add_(-0.48229, previous2_grad).add_(-0.48229*0.9, exp2_avg).add_(-0.0241149, previous4_grad).add_(-0.0241149*0.9, exp4_avg).add_(-0.00884, previous6_grad).add_(-0.00884*0.9, exp6_avg).add_(-0.004642, previous8_grad).add_(-0.004642*0.9, exp8_avg).add_(-0.002878, previous10_grad).add_(-0.002878*0.9, exp10_avg)
+                
+                #0.9-fractional order 第二个
+                # exp_avg.add_(1, grad.clone()).add_(1*0.8, exp_avg).add_(-0.48229, previous2_grad).add_(-0.48229*0.8, exp2_avg).add_(-0.0241149, previous4_grad).add_(-0.0241149*0.8, exp4_avg).add_(-0.00884, previous6_grad).add_(-0.00884*0.8, exp6_avg).add_(-0.004642, previous8_grad).add_(-0.004642*0.8, exp8_avg).add_(-0.002878, previous10_grad).add_(-0.002878*0.8, exp10_avg)
+                
+                
+                #0.9-fractional order 第二个
+                # exp_avg.add_(1, grad.clone()).add_(1*0.8, exp_avg).add_(-0.48229, previous2_grad).add_(-0.48229*0.8, exp2_avg).add_(-0.0241149, previous4_grad).add_(-0.0241149*0.8, exp4_avg).add_(-0.00884, previous6_grad).add_(-0.00884*0.8, exp6_avg).add_(-0.004642, previous8_grad).add_(-0.004642*0.8, exp8_avg).add_(-0.002878, previous10_grad).add_(-0.002878*0.8, exp10_avg)
+                
+                #0.9-fractional order 第二个
+                # exp_avg.add_(1, grad.clone()).add_(1*0.5, exp_avg).add_(-0.48229, previous2_grad).add_(-0.48229*0.5, exp2_avg).add_(-0.0241149, previous4_grad).add_(-0.0241149*0.5, exp4_avg).add_(-0.00884, previous6_grad).add_(-0.00884*0.5, exp6_avg).add_(-0.004642, previous8_grad).add_(-0.004642*0.5, exp8_avg).add_(-0.002878, previous10_grad).add_(-0.002878*0.5, exp10_avg)
+
+                #0.9-fractional order 第二个
+                exp_avg.add_(1, grad.clone()).add_(1*0.5, exp_avg).add_(-0.3348369, previous3_grad).add_(-0.3348369*0.5, exp3_avg).add_(-0.0167418, previous6_grad).add_(-0.0167418*0.5, exp6_avg)
+                
+                
+                #0.9-fractional order 第二个
+                # exp_avg.add_(1, grad.clone()).add_(1*0.6, exp_avg).add_(-0.48229, previous2_grad).add_(-0.48229*0.6, exp2_avg).add_(-0.0241149, previous4_grad).add_(-0.0241149*0.6, exp4_avg).add_(-0.00884, previous6_grad).add_(-0.00884*0.6, exp6_avg).add_(-0.004642, previous8_grad).add_(-0.004642*0.6, exp8_avg).add_(-0.002878, previous10_grad).add_(-0.002878*0.6, exp10_avg)
+                
+
+                #0.9-fractional order 第二个
+                # exp_avg.add_(1, grad.clone()).add_(1*3, exp_avg).add_(-0.48229, previous2_grad).add_(-0.48229*3, exp2_avg).add_(-0.0241149, previous4_grad).add_(-0.0241149*3, exp4_avg).add_(-0.00884, previous6_grad).add_(-0.00884*3, exp6_avg).add_(-0.004642, previous8_grad).add_(-0.004642*3, exp8_avg).add_(-0.002878, previous10_grad).add_(-0.002878*3, exp10_avg)
+                                
+                #0.9-fractional order h=3 第二个
+                # exp_avg.add_(1, grad.clone()).add_(1*3, exp_avg).add_(-0.3348369, previous2_grad).add_(-0.3348369*3, exp2_avg).add_(-0.0167418, previous4_grad).add_(-0.0167418*3, exp4_avg).add_(-0.0061386, previous6_grad).add_(-0.0061386*3, exp6_avg).add_(-0.0032228, previous8_grad).add_(-0.0032228*3, exp8_avg).add_(-0.0019981, previous10_grad).add_(-0.0019981*3, exp10_avg)
+                
+                
+                #0.5-fractional order 第三个
+                # exp_avg.add_(1, grad.clone()).add_(1*0.9, exp_avg).add_(-0.35335, previous2_grad).add_(-0.35335*0.9, exp2_avg).add_(-0.088388, previous4_grad).add_(-0.088388*0.9, exp4_avg).add_(-0.04419, previous6_grad).add_(-0.04419*0.9, exp6_avg).add_(-0.2762, previous8_grad).add_(-0.2762*0.9, exp8_avg)
+
+
+                #0.5-fractional order 第三个
+                # exp_avg.add_(1, grad.clone()).add_(1*0.5, exp_avg).add_(-0.35335, previous2_grad).add_(-0.35335*0.5, exp2_avg).add_(-0.088388, previous4_grad).add_(-0.088388*0.5, exp4_avg).add_(-0.04419, previous6_grad).add_(-0.04419*0.5, exp6_avg).add_(-0.2762, previous8_grad).add_(-0.2762*0.5, exp8_avg)
+
+                #0.5-fractional order 第三个
+                # exp_avg.add_(1, grad.clone()).add_(1*0.3, exp_avg).add_(-0.35335, previous2_grad).add_(-0.35335*0.3, exp2_avg).add_(-0.088388, previous4_grad).add_(-0.088388*0.3, exp4_avg).add_(-0.04419, previous6_grad).add_(-0.04419*0.3, exp6_avg).add_(-0.2762, previous8_grad).add_(-0.2762*0.3, exp8_avg)
+
+                #0.5-fractional order 第三个
+                # exp_avg.add_(1, grad.clone()).add_(1*0.2, exp_avg).add_(-0.35335, previous2_grad).add_(-0.35335*0.2, exp2_avg).add_(-0.088388, previous4_grad).add_(-0.088388*0.2, exp4_avg).add_(-0.04419, previous6_grad).add_(-0.04419*0.2, exp6_avg).add_(-0.2762, previous8_grad).add_(-0.2762*0.2, exp8_avg)
+                
+                #2.5-fractional order 第四个
+                # exp_avg.add_(1, grad.clone()).add_(1*0.9, exp_avg).add_(-0.441941, previous2_grad).add_(-0.441941*0.9, exp2_avg).add_(0.331456, previous4_grad).add_(0.331456*0.9, exp4_avg).add_(-0.055242, previous6_grad).add_(-0.055242*0.9, exp6_avg).add_(-0.006905, previous8_grad).add_(-0.006905*0.9, exp8_avg).add_(-0.00207, previous10_grad).add_(-0.00207*0.9, exp10_avg)
+                
+                #2.5-fractional order 第四个
+                # exp_avg.add_(1, grad.clone()).add_(1*0.5, exp_avg).add_(-0.441941, previous2_grad).add_(-0.441941*0.5, exp2_avg).add_(0.331456, previous4_grad).add_(0.331456*0.5, exp4_avg).add_(-0.055242, previous6_grad).add_(-0.055242*0.5, exp6_avg).add_(-0.006905, previous8_grad).add_(-0.006905*0.5, exp8_avg).add_(-0.00207, previous10_grad).add_(-0.00207*0.5, exp10_avg)
+
+                #2.5-fractional order 第四个
+                # exp_avg.add_(1, grad.clone()).add_(1*0.3, exp_avg).add_(-0.441941, previous2_grad).add_(-0.441941*0.3, exp2_avg).add_(0.331456, previous4_grad).add_(0.331456*0.3, exp4_avg).add_(-0.055242, previous6_grad).add_(-0.055242*0.3, exp6_avg).add_(-0.006905, previous8_grad).add_(-0.006905*0.3, exp8_avg).add_(-0.00207, previous10_grad).add_(-0.00207*0.3, exp10_avg)
+
+                #2.5-fractional order 第四个
+                # exp_avg.add_(1, grad.clone()).add_(1*0.6, exp_avg).add_(-0.441941, previous2_grad).add_(-0.441941*0.6, exp2_avg).add_(0.331456, previous4_grad).add_(0.331456*0.6, exp4_avg).add_(-0.055242, previous6_grad).add_(-0.055242*0.6, exp6_avg).add_(-0.006905, previous8_grad).add_(-0.006905*0.6, exp8_avg).add_(-0.00207, previous10_grad).add_(-0.00207*0.6, exp10_avg)
+
+
+
+                
+                #4.2-fractional order 第五个
+                # exp_avg.add_(1, grad.clone()).add_(1*0.9, exp_avg).add_( -0.2285195, previous2_grad).add_( -0.2285195*0.9, exp2_avg).add_(0.365631, previous4_grad).add_(0.365631*0.9, exp4_avg).add_(-0.268129, previous6_grad).add_(-0.268129*0.9, exp6_avg).add_(0.0804388, previous8_grad).add_(0.0804388*0.9, exp8_avg).add_( -0.0032175, previous10_grad).add_( -0.0032175*0.9, exp10_avg) 
+
+                #0.2-fractional order 第六个
+                # exp_avg.add_(1, grad.clone()).add_(1*0.9, exp_avg).add_(-0.17411011, previous2_grad).add_(-0.17411011*0.9, exp2_avg).add_(-0.069644, previous4_grad).add_(-0.069644*0.9, exp4_avg).add_(-0.041786, previous6_grad).add_(-0.041786*0.9, exp6_avg).add_(-0.02925049, previous8_grad).add_(-0.02925049*0.9, exp8_avg)
+
+                #0.2-fractional order 第六个
+                # exp_avg.add_(3, grad.clone()).add_(1*0.9, exp_avg).add_(-0.17411011, previous2_grad).add_(-0.17411011*0.9, exp2_avg).add_(-0.069644, previous4_grad).add_(-0.069644*0.9, exp4_avg).add_(-0.041786, previous6_grad).add_(-0.041786*0.9, exp6_avg).add_(-0.02925049, previous8_grad).add_(-0.02925049*0.9, exp8_avg)
+
+                #10-fractional order 第七个
+                # exp_avg.add_(1, grad.clone()).add_(1*0.9, exp_avg).add_(-0.009765, previous2_grad).add_(-0.009765*0.9, exp2_avg).add_(0.04394, previous4_grad).add_(0.04394*0.9, exp4_avg).add_(-0.11718, previous6_grad).add_(-0.11718*0.9, exp6_avg).add_(0.2050, previous8_grad).add_(0.2050*0.9, exp8_avg)
+                
+                
+                #10-fractional order 第七个
+                # exp_avg.add_(10, grad.clone()).add_(1*0.9, exp_avg).add_(-0.009765, previous2_grad).add_(-0.009765*0.9, exp2_avg).add_(0.04394, previous4_grad).add_(0.04394*0.9, exp4_avg).add_(-0.11718, previous6_grad).add_(-0.11718*0.9, exp6_avg).add_(0.2050, previous8_grad).add_(0.2050*0.9, exp8_avg)
+                
+                
+                #10-fractional order 
+                # exp_avg.add_(0.009765, previous2_grad).add_(0.009765, exp2_avg).add_(-0.04394, previous4_grad).add_(-0.04394, exp4_avg).add_(0.11718, previous6_grad).add_(0.11718, exp6_avg).add_(-0.2050, previous8_grad).add_(-0.2050, exp8_avg)
+                
+                #0.5-fractional order 
+                # exp_avg.add_(0.35335, previous2_grad).add_(0.35335, exp2_avg).add_(0.088388, previous4_grad).add_(0.088388, exp4_avg).add_(0.04419, previous6_grad).add_(0.04419, exp6_avg).add_(0.2762, previous8_grad).add_(0.2762, exp8_avg)
+                exp10_avg=exp9_avg
+                exp9_avg=exp8_avg
+                exp8_avg=exp7_avg
+                exp7_avg=exp6_avg
+                exp6_avg=exp5_avg
+                exp5_avg=exp4_avg
                 exp4_avg=exp3_avg
                 exp3_avg=exp2_avg
                 exp2_avg=exp1_avg
                 exp1_avg=exp_avg
+                
+                
+                
+                previous10_grad = previous9_grad
+                previous9_grad = previous8_grad
+                previous8_grad = previous7_grad
+                previous7_grad = previous6_grad
+                previous6_grad = previous5_grad
+                previous5_grad = previous4_grad
+                previous4_grad = previous3_grad
+                previous3_grad = previous2_grad
+                previous2_grad = previous1_grad
+                previous1_grad = grad.clone()
+				
+                
+                
+                
+                
+                
+                
+                
                 
                 
                 exp_avg1 = exp_avg
